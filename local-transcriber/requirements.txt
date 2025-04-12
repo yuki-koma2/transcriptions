@@ -1,0 +1,6 @@
+openai-whisper
+resemblyzer
+scikit-learn
+pydub
+numpy
+torch 
