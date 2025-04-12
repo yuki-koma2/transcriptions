@@ -24,6 +24,7 @@ async function transcribeAudio(filePath) {
   form.append('file', fs.createReadStream(filePath));
   form.append('model', 'whisper-1');
   // Add other parameters like language if needed
+  // form.append('language', 'ja'); // Specify language for potentially better accuracy
 
   try {
     const response = await axios.post(API_URL, form, {
@@ -32,7 +33,7 @@ async function transcribeAudio(filePath) {
         'Authorization': `Bearer ${OPENAI_API_KEY}`,
       },
       // Optional: Add timeout if needed
-      // timeout: 60000, // e.g., 60 seconds
+      timeout: 60000, // 60 seconds timeout
     });
 
     // Output the transcription text
@@ -65,4 +66,14 @@ if (args.length === 0) {
 }
 
 const audioFilePath = args[0];
-transcribeAudio(audioFilePath);
+
+// Wrap the main execution in an async IIFE to catch top-level errors
+(async () => {
+  try {
+    await transcribeAudio(audioFilePath);
+  } catch (error) {
+    // Catch any unexpected errors not handled within transcribeAudio
+    console.error('An unexpected error occurred:', error.message);
+    process.exit(1);
+  }
+})();
