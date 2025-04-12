@@ -16,16 +16,18 @@ def convert_mp3_to_wav(mp3_path, wav_path):
     """
     pydubを使ってMP3ファイルをWAVに変換する
     """
+    print("Starting MP3 to WAV conversion...")  # 追加：変換開始の進捗表示
     audio = AudioSegment.from_mp3(mp3_path)
     audio.export(wav_path, format="wav")
-    print(f"Converted {mp3_path} to {wav_path}")
+    print(f"Finished conversion: {mp3_path} -> {wav_path}")  # 変更：変換完了の表示
 
 def transcribe_with_speaker_diarization(wav_path, output_path="transcript.txt"):
     # Whisperで文字起こし（結果はJSON形式）
-    print("Running transcription with Whisper...")
+    print("Running transcription with Whisper... (This may take some time)")
     result = whisper_model.transcribe(wav_path)
     segments = result.get("segments", [])
-    
+    print(f"Whisper finished. Detected {len(segments)} segments.")  # 追加：セグメント数表示
+
     # 音声全体をpreprocessしてwav配列（16kHz）として読み込み
     wav = preprocess_wav(wav_path)
 
@@ -34,7 +36,9 @@ def transcribe_with_speaker_diarization(wav_path, output_path="transcript.txt"):
     
     print("Extracting speaker embeddings for each segment...")
     # 各セグメントごとにResemblyzerで特徴量抽出
-    for segment in segments:
+    total_segments = len(segments)
+    for i, segment in enumerate(segments):
+        print(f"Processing segment {i+1}/{total_segments} (time {segment.get('start', 0):.2f} - {segment.get('end', 0):.2f} sec)...")
         start = segment.get("start", 0)
         end = segment.get("end", 0)
         # 16kHzに合わせたサンプル数でスライス
