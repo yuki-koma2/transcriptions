@@ -7,13 +7,9 @@ import numpy as np
 import torch
 import os
 
-# GPUが利用可能なら設定
+# GPUが利用可能なら設定 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-
-# Whisperモデルのロード（largeモデルなどお好みで）
 whisper_model = whisper.load_model("large", device=device)
-
-# Resemblyzerのエンコーダーをロード
 encoder = VoiceEncoder(device=device)
 
 def convert_mp3_to_wav(mp3_path, wav_path):
