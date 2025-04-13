@@ -52,6 +52,30 @@
 9.  **動作確認:**
     Slack でボットをチャンネルに招待し、メンション (`@ボット名`) を送信して、ボットが応答するか確認します。
 
+## :whale: Docker での実行手順 (ローカルテスト用)
+
+ローカルでの基本的な動作確認後、または直接 Docker で開発を進めたい場合は、以下の手順で Docker コンテナを起動します。
+
+1.  **Docker イメージのビルド:**
+    `hello-slack` ディレクトリで以下のコマンドを実行します。
+    ```bash
+    docker build -t slack-bot-app .
+    ```
+2.  **Docker コンテナの起動:**
+    `.env` ファイルの環境変数をコンテナに渡しつつ、ローカルのポート 3000 をコンテナのポート 3000 にマッピングして起動します。
+    ```bash
+    docker run --env-file .env -p 3000:3000 slack-bot-app
+    ```
+    これで Docker コンテナ内で FastAPI サーバーが起動します。
+3.  **ngrok の起動と Slack App 設定:**
+    上記「セットアップ手順」のステップ 7〜9 と同様に、ngrok を起動して公開 URL を取得し、Slack App の Event Subscriptions の Request URL に設定します。
+    ```bash
+    ngrok http 3000
+    ```
+    **注意:** ngrok が転送する先は `http://localhost:3000` のままです。Docker コンテナはローカルホストのポート 3000 にマッピングされています。
+4.  **動作確認:**
+    Slack でボットにメンションを送信し、応答が返ってくるか確認します。
+
 ## :rocket: 今後の計画 (PRDに基づく)
 
 1.  **Whisper 連携:** Slack にアップロードされた音声ファイルをダウンロードし、OpenAI Whisper API を使用して文字起こしを行い、結果を Slack に投稿する機能を追加します。(`file_shared` イベントの処理)
@@ -59,3 +83,9 @@
 3.  **Docker 化:** アプリケーションを Docker コンテナで実行できるように `Dockerfile` を作成します。
 4.  **Cloud Run デプロイ:** Docker イメージを Google Cloud Build でビルドし、Google Cloud Run にデプロイします。
 5.  **Next.js フロントエンド構築:** 必要に応じて、ユーザーインターフェースを提供するための Next.js アプリケーションを構築し、Firebase App Hosting にデプロイします。 
+
+
+## 現時点でのメモ
+
+sockert modeで動かすときにdockerだと上手くいかない。
+httpモードはそもそもなんか動かないし。困った。
