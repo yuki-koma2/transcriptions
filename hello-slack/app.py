@@ -4,7 +4,7 @@ import re
 from slack_bolt import App
 from dotenv import load_dotenv
 from slack_bolt.adapter.socket_mode import SocketModeHandler
-from openai import OpenAI # OpenAIライブラリをインポート
+from openai import OpenAI 
 
 
 print("--- app.py script started ---")
@@ -113,7 +113,7 @@ def handle_app_mention(event, say, context):
         # ChatGPT APIを呼び出す
         try:
             response = client.chat.completions.create(
-                model="gpt-4o",
+                model="gpt-4o-mini-2024-07-18",
                 messages=messages
             )
             chatgpt_response = response.choices[0].message.content
