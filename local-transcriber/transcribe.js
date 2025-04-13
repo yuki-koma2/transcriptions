@@ -24,6 +24,7 @@ async function transcribeAudio(filePath, withSummary = false) {
   const form = new FormData();
   form.append('file', fs.createReadStream(filePath));
   form.append('model', 'whisper-1');
+  // form.append('model', 'gpt-4o-transcribe');
   // Add other parameters like language if needed
   // form.append('language', 'ja'); // Specify language for potentially better accuracy
 
