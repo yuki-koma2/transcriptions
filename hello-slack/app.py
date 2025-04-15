@@ -173,11 +173,13 @@ def handle_app_mention(event, say, context, client): # client を引数に追加
                  # 最初の返信: 文字起こし全文
                  full_transcription = " ".join([seg.get('text', '') for seg in segments]).strip()
                  if full_transcription:
-                     # 長すぎる場合は分割して送信する考慮が必要かもしれない
-                     # Slackのメッセージ長制限は約4000文字
-                     if len(full_transcription) > 3800:
-                          say(f"<@{user}> 文字起こし結果(冒頭部分):\n```\n{full_transcription[:3800]}...\n```", thread_ts=thread_ts)
-                          logging.warning("Transcription result was too long, truncated.")
+                     # Slackのメッセージ長制限は約4000文字なので、余裕をもって分割
+                     max_length = 3800
+                     if len(full_transcription) > max_length:
+                         parts = [full_transcription[i:i+max_length] for i in range(0, len(full_transcription), max_length)]
+                         for i, part in enumerate(parts):
+                             say(f"<@{user}> 文字起こし結果({i+1}/{len(parts)}):\n```\n{part}\n```", thread_ts=thread_ts)
+                         logging.warning("Transcription result was too long, split into multiple messages.")
                      else:
                           say(f"<@{user}> 文字起こし結果:\n```\n{full_transcription}\n```", thread_ts=thread_ts)
                  else:
@@ -194,10 +196,12 @@ def handle_app_mention(event, say, context, client): # client を引数に追加
             if formatted_transcription:
                  logging.info("Speaker diarization successful.")
                  # 2番目の返信: 話者分離結果
-                 # これも長すぎる場合の考慮が必要
-                 if len(formatted_transcription) > 3800 :
-                      say(f"<@{user}> 話者分離結果(冒頭部分):\n{formatted_transcription[:3800]}...", thread_ts=thread_ts)
-                      logging.warning("Diarization result was too long, truncated.")
+                 max_length = 3800 # 再度定義（スコープのため）
+                 if len(formatted_transcription) > max_length :
+                      parts = [formatted_transcription[i:i+max_length] for i in range(0, len(formatted_transcription), max_length)]
+                      for i, part in enumerate(parts):
+                           say(f"<@{user}> 話者分離結果({i+1}/{len(parts)}):\n{part}", thread_ts=thread_ts) # コードブロックは不要かも
+                      logging.warning("Diarization result was too long, split into multiple messages.")
                  else:
                       say(f"<@{user}> 話者分離結果:\n{formatted_transcription}", thread_ts=thread_ts)
             else:
